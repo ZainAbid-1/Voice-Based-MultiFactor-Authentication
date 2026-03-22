@@ -1,137 +1,66 @@
-# 🎙️ Voice-Based Multi-Factor Authentication (MFA)
+AI-Driven Voice-Based Multi-Factor Authentication
 
-> **Secure. Biometric. Modern.**
+A secure, AI-powered authentication system designed for corporate environments (e.g., attendance systems). This project combines voice biometrics ("something you are") with PIN verification ("something you know") to eliminate identity fraud, buddy punching, and deepfake-based attacks.
 
-A full-stack authentication system that combines traditional credentials (PIN) with AI-powered Voice Biometrics. This project utilizes Deep Learning to generate unique voice embeddings, verifying users based on *who they are*, not just *what they know*.
+🚀 Overview
 
----
+Traditional security measures like PINs or simple biometrics are vulnerable to theft, replay attacks, and AI-generated deepfakes. This system implements a high-integrity AI Security Pipeline to ensure that the user is both physically present and authentically verified.
 
-## 🚀 Features
+Key Use Case
 
-- **Multi-Factor Authentication:** Requires both a PIN and a matching Voice Sample to log in.
-- **AI-Powered Recognition:** Uses **SpeechBrain** (ECAPA-TDNN model) to extract high-fidelity speaker embeddings.
-- **Bank-Grade Security:**
-  - **PINs:** Hashed using `bcrypt` (Salted & Hashed).
-  - **Voiceprints:** Encrypted using `Fernet` (AES-256) before storage.
-- **Robust Audio Processing:** Handles cross-platform audio formats (WebM to WAV conversion) using `FFmpeg` and `Pydub`.
-- **Modern Frontend:** Built with **React (TypeScript)**, featuring Dark Mode, Framer Motion animations, and real-time waveform visualization.
-- **Database:** Persistent storage using **MySQL**.
+Corporate Attendance Systems: Replaces traditional badge-in or fingerprint systems to prevent "buddy punching" and ensure contactless, secure clock-ins.
 
----
+🛠️ Tech Stack
 
-## 🛠️ Tech Stack
+Frontend: React
 
-### Frontend
-- **Framework:** React + Vite
-- **Language:** TypeScript
-- **Styling:** Tailwind CSS
-- **Animations:** Motion (Framer Motion)
-- **HTTP Client:** Axios
-- **Icons:** Lucide React
+Backend: FastAPI (Python)
 
-### Backend
-- **Framework:** FastAPI (Python)
-- **Server:** Uvicorn
-- **Database ORM:** SQLAlchemy
-- **Database:** MySQL
-- **Audio Processing:** Pydub, FFmpeg, NumPy
-- **Machine Learning:** PyTorch, SpeechBrain
+Database: MySQL (with AES-256-GCM encryption)
 
----
+AI/ML Frameworks: SpeechBrain, Transformers (Hugging Face)
 
-## ⚙️ Prerequisites
+Audio Processing: Pydub, Wav2Vec2
 
-Before running the project, ensure you have the following installed:
+Security: BCrypt (PIN hashing), JWT (Session management)
 
-1.  **Python 3.9+**
-2.  **Node.js & npm**
-3.  **MySQL Server** (Running locally)
-4.  **FFmpeg** (Must be added to your System PATH)
-    *   *Windows users: Download FFmpeg, extract it, and add the `bin` folder to your Environment Variables.*
+🔐 The AI Security Pipeline
 
----
+Authentication is processed through a 4-gate verification flow:
 
-## 📦 Installation & Setup
+Gate 0: Pre-Processing: Audio normalization (-3dB) and conversion to 16kHz WAV.
 
-### 1. Database Setup
-1.  Open **MySQL Workbench**.
-2.  Run the following SQL command to create the database:
-    ```sql
-    CREATE DATABASE voice_mfa;
-    ```
+Gate 1: Noise Cancellation: Utilizes SpeechBrain Sepformer to isolate voice from background office noise.
 
-### 2. Backend Setup
-Navigate to the `backend` folder:
+Gate 2: Anti-Spoofing & Liveness:
 
-```bash
-cd backend
-Create and activate a virtual environment:
-code
-Bash
-# Windows
-python -m venv venv
-venv\Scripts\activate
-Install dependencies:
-code
-Bash
-pip install -r requirements.txt
-Configuration:
-Open backend/database.py and update the connection string with your MySQL credentials.
-Note: If your password contains @, replace it with %40.
-code
-Python
-SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:YOUR_PASSWORD@localhost/voice_mfa"
-Run the Server:
-code
-Bash
-uvicorn main:app --reload
-The server will start on http://127.0.0.1:8000. On the first run, it will download the AI models (approx 500MB).
-3. Frontend Setup
-Open a new terminal and navigate to the frontend folder:
-code
-Bash
-cd frontend
-Install dependencies:
-code
-Bash
-npm install
-Run the development server:
-code
-Bash
-npm run dev
-The app will open at http://localhost:5173 (or similar).
-🧪 How to Test
-Phase 1: Enrollment (Registration)
-Go to the Register page.
-Enter a Username and a PIN.
-Click the Microphone button and say the phrase: "My voice is my password".
-Submit.
-Backend Action: The audio is converted to 16kHz WAV -> AI extracts vector -> Vector is Encrypted -> Saved to MySQL.
-Phase 2: Authentication (Login)
-Go to the Login page.
-Enter the same Username and PIN.
-Record your voice saying the phrase again.
-Result:
-Success: If the PIN matches AND the voice similarity score is > 0.75.
-Failure: If the PIN is wrong OR the voice does not match.
-🧠 Architecture Overview
-Audio Capture: The browser records audio as a .webm blob.
-Preprocessing: FastAPI receives the blob. Pydub converts it to a standard 16kHz Mono WAV file (bypassing Windows TorchCodec issues).
-Embedding Extraction: The audio tensor is passed to SpeechBrain's ECAPA-TDNN model, which outputs a 192-dimensional vector (the "Voiceprint").
-Comparison: During login, Cosine Similarity is calculated between the live voiceprint and the decrypted stored voiceprint.
-code
-Python
-# Cosine Similarity Formula
-similarity = (A . B) / (||A|| * ||B||)
-🔧 Troubleshooting
-Error: TorchCodec is required / torchaudio.load failed:
-This project uses a custom utils.py implementation that uses pydub and numpy to bypass torchaudio's strict dependency on Windows. Ensure you are using the provided utils.py.
-Error: FileNotFoundError (WinError 2):
-FFmpeg is not in your System Path. Install FFmpeg and restart your terminal.
-Database Connection Failed:
-Check if MySQL Service is running in Services.msc.
-Ensure your password in database.py is URL encoded (e.g., %40 instead of @).
-Privilege Error (WinError 1314):
-Run your terminal/IDE as Administrator or enable "Developer Mode" in Windows settings to allow the AI model to create symbolic links.
-📜 License
-This project is open-source and available under the MIT License.
+Deepfake Detection: Uses a Melody Machine transformer model to detect synthetic voices.
+
+Acoustic Artifact Analysis: Detects replay attacks by identifying low-frequency rumbles or high-frequency loss typical of speakers.
+
+Gate 3: Biometric Verification: Uses ECAPA-TDNN to extract voice embeddings and compare them against stored voiceprints using Cosine Similarity.
+
+✨ Security Features
+
+Multi-Factor Orchestration: Combines verbal PIN entry with voiceprint matching.
+
+Zero-Trust Architecture: Raw biometric data is never accessible to administrators; voiceprints are stored as encrypted embeddings.
+
+Brute Force Protection: Implements an Exponential Backoff Algorithm (10-min, 30-min, and 24-hour lockout tiers).
+
+High-Integrity Enrollment: Strict 3-sample enrollment process; if any sample fails the anti-spoofing check, registration is rejected.
+
+Database Encryption: Military-grade AES-256-GCM for data at rest and BCrypt with unique salting for PINs.
+
+📊 System Architecture
+
+The system follows a modern web architecture:
+
+React Frontend captures audio via the browser microphone.
+
+FastAPI Backend handles the logic and orchestrates the AI models.
+
+MySQL Database stores encrypted voiceprints and audit logs (LoginAttempt tables) for accountability.
+
+
+Developed by myself and https://github.com/Shayan-Maqsood as an Information Security End-Semester Project.
