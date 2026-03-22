@@ -1,66 +1,90 @@
-AI-Driven Voice-Based Multi-Factor Authentication
+AI-Driven Voice-Based MFA
 
-A secure, AI-powered authentication system designed for corporate environments (e.g., attendance systems). This project combines voice biometrics ("something you are") with PIN verification ("something you know") to eliminate identity fraud, buddy punching, and deepfake-based attacks.
+A secure, AI-powered authentication system built with React and FastAPI. It combines voice biometrics ("something you are") and PIN verification ("something you know") to eliminate identity fraud, buddy punching, and deepfake-based attacks.
 
-🚀 Overview
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+📦 Stack
 
-Traditional security measures like PINs or simple biometrics are vulnerable to theft, replay attacks, and AI-generated deepfakes. This system implements a high-integrity AI Security Pipeline to ensure that the user is both physically present and authentically verified.
+React (Frontend)
 
-Key Use Case
+FastAPI (Python Backend)
 
-Corporate Attendance Systems: Replaces traditional badge-in or fingerprint systems to prevent "buddy punching" and ensure contactless, secure clock-ins.
+MySQL (AES-256-GCM encrypted storage)
 
-🛠️ Tech Stack
+SpeechBrain (Voice biometrics & Sepformer noise cancellation)
 
-Frontend: React
+Transformers (Deepfake detection models)
 
-Backend: FastAPI (Python)
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+✨ Quick start
+code
+Bash
+download
+content_copy
+expand_less
+# Install dependencies and start the backend
+pip install -r requirements.txt
+uvicorn main:app --reload
 
-Database: MySQL (with AES-256-GCM encryption)
+# Install dependencies and start the frontend
+npm install
+npm run dev
 
-AI/ML Frameworks: SpeechBrain, Transformers (Hugging Face)
-
-Audio Processing: Pydub, Wav2Vec2
-
-Security: BCrypt (PIN hashing), JWT (Session management)
-
-🔐 The AI Security Pipeline
-
-Authentication is processed through a 4-gate verification flow:
-
-Gate 0: Pre-Processing: Audio normalization (-3dB) and conversion to 16kHz WAV.
-
-Gate 1: Noise Cancellation: Utilizes SpeechBrain Sepformer to isolate voice from background office noise.
-
-Gate 2: Anti-Spoofing & Liveness:
-
-Deepfake Detection: Uses a Melody Machine transformer model to detect synthetic voices.
-
-Acoustic Artifact Analysis: Detects replay attacks by identifying low-frequency rumbles or high-frequency loss typical of speakers.
-
-Gate 3: Biometric Verification: Uses ECAPA-TDNN to extract voice embeddings and compare them against stored voiceprints using Cosine Similarity.
-
-✨ Security Features
-
-Multi-Factor Orchestration: Combines verbal PIN entry with voiceprint matching.
-
-Zero-Trust Architecture: Raw biometric data is never accessible to administrators; voiceprints are stored as encrypted embeddings.
-
-Brute Force Protection: Implements an Exponential Backoff Algorithm (10-min, 30-min, and 24-hour lockout tiers).
-
-High-Integrity Enrollment: Strict 3-sample enrollment process; if any sample fails the anti-spoofing check, registration is rejected.
-
-Database Encryption: Military-grade AES-256-GCM for data at rest and BCrypt with unique salting for PINs.
-
-📊 System Architecture
-
-The system follows a modern web architecture:
-
-React Frontend captures audio via the browser microphone.
-
-FastAPI Backend handles the logic and orchestrates the AI models.
-
-MySQL Database stores encrypted voiceprints and audit logs (LoginAttempt tables) for accountability.
+Enroll your voice with 3 samples to generate a secure biometric voiceprint.
 
 
-Developed by myself and https://github.com/Shayan-Maqsood as an Information Security End-Semester Project.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+🔐 Security Features
+
+MFA Orchestration — Combined verbal PIN entry and voiceprint matching.
+
+Anti-Spoofing — Dedicated detection for replay attacks and AI-generated clones.
+
+Brute Force Protection — Exponential backoff algorithm with tiered lockout (10m, 30m, 24h).
+
+Zero-Trust Design — No raw biometric data is stored; only encrypted embeddings.
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+🎹 Controls
+
+Enrollment — Record 3 voice samples for identity anchoring.
+
+Verification — State your PIN to initiate biometric comparison.
+
+Audit Logs — Every attempt is timestamped and recorded in the LoginAttempt table.
+
+High-integrity enrollment is enforced; any single failed sample halts the entire registration.
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+🤖 How it works
+
+The system processes authentication requests through a 4-gate AI security pipeline:
+
+Gate 0 & 1 — Audio is normalized to -3dB and cleaned via the Sepformer noise cancellation model.
+
+Gate 2 (Liveness) — Frequency domain analysis detects "rumble" or high-frequency loss typical of replay attacks.
+
+Gate 2 (Deepfake) — A Melody Machine transformer model identifies synthetic generative artifacts.
+
+Gate 3 (Biometric) — ECAPA-TDNN extracts embeddings for Cosine Similarity matching against the encrypted database.
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+📁 Project structure
+code
+Code
+download
+content_copy
+expand_less
+src/
+  frontend/            # React UI for audio capture and status
+  backend/
+    api/               # FastAPI endpoints and rate limiting
+    ai_pipeline/       # SpeechBrain, ECAPA-TDNN, and Anti-spoofing logic
+    security/          # AES-256-GCM encryption and BCrypt hashing
+  database/            # MySQL schema for user profiles and audit logs
+👤 Authors
+
+Developed by Shayan Maqsood  & Zain Abid  — Information Security End Semester Project
